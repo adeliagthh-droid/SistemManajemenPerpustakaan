@@ -1,193 +1,170 @@
 # Sistem Manajemen Perpustakaan Kampus
 
-## Implementasi dan Pembahasan Array 3D dan ArrayList
+## Implementasi dan Pembahasan Stack dan Queue
 
-### 1. Deskripsi Fitur
-Pada bagian ini, fokus utama pengembangan adalah mengimplementasikan **Array 3 Dimensi** dan **ArrayList** ke dalam sistem manajemen perpustakaan berbasis Java.
+## 1. Deskripsi Fitur
 
-* **Array 3 Dimensi** digunakan untuk merepresentasikan lokasi penyimpanan buku berdasarkan tiga petunjuk: lantai, nomor rak, dan posisi buku di dalam rak. Contoh gambarannya itu seperti gedung perpustakaan: setiap lantai punya beberapa rak, dan setiap rak punya beberapa slot tempat untuk buku diletakkan.
-* **ArrayList** digunakan untuk mengelola daftar buku secara dinamis, yaitu jumlah buku dapat bertambah saat buku ditambahkan dan berkurang saat buku dihapus tanpa perlu menentukan ukuran di awal.
-* Kedua struktur data ini saling terhubung. Saat buku ditambahkan, datanya masuk ke ArrayList dan judulnya ditempatkan pada posisi rak di Array 3D. Saat buku dihapus, datanya dikeluarkan dari ArrayList dan posisi rak tersebut dikosongkan kembali.
-* Data satu buku disimpan dalam sebuah objek dari class `Buku` yang dibuat terpisah pada file `Buku.java`.
+Pada bagian ini, fokus utama pengembangan adalah mengimplementasikan struktur data **Stack** dan **Queue** ke dalam sistem manajemen perpustakaan berbasis Java.
+
+- **Stack** digunakan untuk menyimpan riwayat transaksi dengan prinsip **LIFO (Last In, First Out)**, yaitu transaksi yang terakhir dimasukkan akan menjadi transaksi pertama yang ditampilkan atau dihapus.
+- **Queue** digunakan untuk mengelola antrean mahasiswa dengan prinsip **FIFO (First In, First Out)**, yaitu mahasiswa yang pertama masuk ke antrean akan menjadi mahasiswa pertama yang diproses.
+
+Kedua struktur data tersebut diintegrasikan ke dalam menu utama program sehingga pengguna dapat memilih fitur riwayat transaksi maupun antrean mahasiswa.
+
+> **Catatan:** Riwayat transaksi dan antrean mahasiswa disimpan sementara selama program berjalan. Data akan hilang ketika program dihentikan karena belum menggunakan penyimpanan permanen seperti database.
 
 ---
 
-### 2. Penjelasan *Source Code* Baris demi Baris
-Berikut adalah penjelasan rinci baris demi baris dari kode program yang diimplementasikan pada bagian Anggota 2:
+## 2. Penjelasan Source Code Baris demi Baris
 
-#### A. Class `Buku` (file `Buku.java`)
+Berikut adalah penjelasan bagian-bagian kode program yang diimplementasikan pada bagian **Anggota 3** dalam file `Main.java`.
 
-* `package main;`
-  Menyatakan bahwa class `Buku` berada dalam package `main`, sama dengan class utama program, sehingga keduanya dapat saling digunakan.
+### A. Import Library dan Deklarasi Stack dan Queue
 
-* `public class Buku {`
-  Mendeklarasikan class `Buku` yang berfungsi sebagai "cetakan" data satu buku. Setiap buku yang ditambahkan akan dibuat sebagai satu objek dari class ini.
+| Kode | Penjelasan |
+|------|------------|
+| `import java.util.Stack;` | Mengimpor class Stack dari pustaka Java agar dapat digunakan untuk menyimpan dan mengelola riwayat transaksi menggunakan prinsip LIFO. |
+| `import java.util.Queue;` | Mengimpor interface Queue yang digunakan untuk mendefinisikan struktur data antrean mahasiswa. |
+| `import java.util.LinkedList;` | Mengimpor class LinkedList yang digunakan sebagai implementasi dari interface Queue. |
+| `static Stack<String> riwayatTransaksi = new Stack<>();` | Membuat objek Stack bernama `riwayatTransaksi` yang menyimpan data transaksi dalam bentuk teks (String). Objek ini dapat digunakan oleh method dalam class utama. |
+| `static Queue<String> antreanMahasiswa = new LinkedList<>();` | Membuat objek Queue bernama `antreanMahasiswa` dengan implementasi LinkedList. Struktur data ini digunakan untuk menyimpan nama mahasiswa berdasarkan urutan kedatangan. |
 
-* `private String judul;` dan `private String kategori;`
-  Mendeklarasikan atribut bertipe `String` untuk menyimpan judul dan kategori buku. Kata kunci `private` membuat atribut hanya dapat diakses dari dalam class `Buku` itu sendiri (konsep *encapsulation*).
+### B. Menu Anggota 3 pada Class Utama
 
-* `private int lantai;`, `private int rak;`, dan `private int posisi;`
-  Mendeklarasikan atribut bertipe `int` untuk menyimpan lokasi buku, yaitu nomor lantai, nomor rak, dan nomor posisi di dalam rak.
+| Kode | Penjelasan |
+|------|------------|
+| `System.out.println("--- Anggota 3: Riwayat Transaksi & Antrean Mahasiswa ---");` | Menampilkan judul bagian menu yang berisi fitur Stack dan Queue milik Anggota 3. |
+| `System.out.println("7. Riwayat Transaksi (Stack)");` | Menampilkan pilihan menu untuk mengelola riwayat transaksi. |
+| `System.out.println("8. Antrean Mahasiswa (Queue)");` | Menampilkan pilihan menu untuk mengelola antrean mahasiswa. |
+| `System.out.println("9. Keluar");` | Menampilkan pilihan untuk menghentikan program. |
+| `case 7:` | Memanggil method menu Stack ketika pengguna memilih angka 7. |
+| `case 8:` | Memanggil method menu Queue ketika pengguna memilih angka 8. |
+| `case 9:` | Menjalankan proses keluar dari program. |
 
-* `public Buku(String judul, String kategori, int lantai, int rak, int posisi) {`
-  Mendeklarasikan *constructor*, yaitu method khusus yang dijalankan saat objek `Buku` dibuat dengan `new Buku(...)`. Constructor menerima lima nilai sebagai parameter.
+### C. Menu Riwayat Transaksi (Stack)
 
-* `this.judul = judul;` (dan baris serupa untuk atribut lainnya)
-  Menyalin nilai parameter ke atribut milik objek. Kata `this` menunjukkan bahwa yang diisi adalah atribut objek, bukan parameter yang namanya sama.
+Menu riwayat transaksi digunakan untuk menjalankan operasi penambahan, penampilan, dan penghapusan transaksi terakhir.
 
-* `public String getJudul() { return judul; }` (dan `getKategori()`, `getLantai()`, `getRak()`, `getPosisi()`)
-  Method *getter* yang berfungsi mengembalikan nilai atribut `private` agar dapat dibaca dari class lain. Karena atribut dikunci dengan `private`, getter menjadi satu-satunya jalan untuk membaca datanya.
+Method menu Stack menampilkan pilihan untuk menambahkan transaksi, melihat transaksi terakhir, membatalkan transaksi terakhir, melihat seluruh riwayat, dan kembali ke menu utama.
 
-#### B. Deklarasi Data pada Class Utama
+| Operasi | Penjelasan |
+|---------|------------|
+| `push(transaksi)` | Menambahkan transaksi baru ke bagian paling atas Stack. Transaksi yang baru dimasukkan menjadi transaksi terakhir. |
+| `peek()` | Mengambil atau menampilkan transaksi yang berada di bagian paling atas Stack tanpa menghapusnya. Jika Stack kosong, program menampilkan informasi bahwa belum ada transaksi. |
+| `pop()` | Menghapus dan mengembalikan transaksi yang berada di bagian paling atas Stack. Operasi ini digunakan pada fitur pembatalan transaksi terakhir. |
+| `isEmpty()` | Memeriksa apakah Stack kosong sebelum transaksi ditampilkan atau dihapus. Pemeriksaan ini membantu mencegah kesalahan ketika tidak ada data. |
 
-* `import java.util.ArrayList;`
-  Mengimpor class `ArrayList` dari pustaka bawaan Java agar dapat digunakan untuk membuat daftar buku yang ukurannya dinamis.
+Perulangan dari indeks terakhir menuju indeks pertama digunakan untuk menampilkan riwayat transaksi dari yang terbaru hingga yang terlama.
 
-* `static final int JUMLAH_LANTAI = 2;`, `JUMLAH_RAK = 3;`, dan `JUMLAH_POSISI = 4;`
-  Mendeklarasikan tiga konstanta yang menentukan ukuran gedung perpustakaan: 2 lantai, 3 rak per lantai, dan 4 posisi per rak. Kata kunci `final` membuat nilainya tidak dapat diubah, dan dengan konstanta ini ukuran rak cukup diubah di satu tempat saja.
+### D. Fitur Tambah Transaksi
 
-* `static String[][][] lokasiBuku = new String[JUMLAH_LANTAI][JUMLAH_RAK][JUMLAH_POSISI];`
-  Mendeklarasikan **Array 3 Dimensi** bertipe `String` dengan nama `lokasiBuku`. Indeks pertama mewakili lantai, indeks kedua mewakili rak, dan indeks ketiga mewakili posisi. Total terdapat 2 x 3 x 4 = 24 slot penyimpanan, yang masing-masing menyimpan judul buku atau tulisan "Kosong".
+| Kode | Penjelasan |
+|------|------------|
+| `String transaksi = scanner.nextLine().trim();` | Membaca deskripsi transaksi yang dimasukkan pengguna dan menghapus spasi di awal maupun akhir teks. |
+| `transaksi.isEmpty()` | Memeriksa apakah pengguna memasukkan teks kosong. Jika kosong, transaksi tidak ditambahkan. |
+| `riwayatTransaksi.push(transaksi);` | Memasukkan deskripsi transaksi ke dalam Stack. |
+| `System.out.println(...)` | Menampilkan pesan bahwa transaksi berhasil ditambahkan. |
 
-* `static ArrayList<Buku> daftarBuku = new ArrayList<>();`
-  Membuat **ArrayList** bernama `daftarBuku` yang hanya boleh berisi objek `Buku`. Awalnya daftar ini kosong dan ukurannya bertambah otomatis setiap kali buku ditambahkan.
+Fitur ini memungkinkan pengguna memasukkan deskripsi transaksi secara manual, misalnya peminjaman buku atau pengembalian buku.
 
-#### C. Pengisian Awal Array 3D (di dalam method `main`)
+### E. Fitur Melihat Transaksi Terakhir
 
-* `for (int l = 0; l < JUMLAH_LANTAI; l++) {`, `for (int r = 0; r < JUMLAH_RAK; r++) {`, dan `for (int p = 0; p < JUMLAH_POSISI; p++) {`
-  Tiga perulangan `for` yang bersarang (*nested loop*). Perulangan terluar (`l`) berjalan untuk setiap lantai, perulangan tengah (`r`) untuk setiap rak, dan perulangan terdalam (`p`) untuk setiap posisi. Dengan begitu, seluruh 24 slot dikunjungi satu per satu.
+| Kode | Penjelasan |
+|------|------------|
+| `riwayatTransaksi.isEmpty()` | Memeriksa apakah Stack memiliki data transaksi. |
+| `riwayatTransaksi.peek()` | Mengambil transaksi paling baru tanpa menghapusnya dari Stack. |
+| `System.out.println(...)` | Menampilkan transaksi terakhir yang tersimpan. |
 
-* `lokasiBuku[l][r][p] = "Kosong";`
-  Mengisi setiap slot dengan teks "Kosong" sebagai tanda belum ada buku. Tanpa langkah ini, isi array `String` bernilai `null` dan dapat menyebabkan error saat dibandingkan atau ditampilkan.
+Fitur ini menerapkan prinsip LIFO karena transaksi yang terakhir ditambahkan berada di posisi paling atas Stack.
 
-#### D. Menu Anggota 2 (di dalam `switch (pilihan)`)
+### F. Fitur Membatalkan Transaksi Terakhir
 
-* `System.out.println("3. Tambah Buku (ArrayList + Array 3D)");` sampai `System.out.println("6. Tampilkan Denah Lokasi Penyimpanan (Array 3D)");`
-  Mencetak empat pilihan menu milik Anggota 2 pada layar.
+| Kode | Penjelasan |
+|------|------------|
+| `riwayatTransaksi.isEmpty()` | Memastikan terdapat transaksi yang dapat dihapus. |
+| `riwayatTransaksi.pop()` | Menghapus transaksi yang berada di bagian paling atas Stack. |
+| `System.out.println(...)` | Menampilkan informasi transaksi yang telah dihapus dari riwayat. |
 
-* `case 3:` memanggil `tambahBuku();`
-  Menjalankan method untuk menambah buku, lalu `break;` menghentikan percabangan.
+> **Catatan:** Fitur pembatalan ini hanya menghapus catatan transaksi dari Stack. Fitur tersebut tidak secara otomatis membatalkan proses peminjaman atau pengembalian buku pada bagian program lainnya.
 
-* `case 4:` memanggil `tampilkanDaftarBuku();`
-  Menjalankan method untuk menampilkan seluruh buku yang ada di ArrayList.
+### G. Fitur Menampilkan Seluruh Riwayat Transaksi
 
-* `case 5:` memanggil `hapusBuku();`
-  Menjalankan method untuk menghapus buku dari ArrayList sekaligus mengosongkan posisinya di rak.
+| Kode | Penjelasan |
+|------|------------|
+| `riwayatTransaksi.isEmpty()` | Memeriksa apakah terdapat riwayat transaksi yang tersimpan. |
+| Perulangan dari `riwayatTransaksi.size() - 1` | Digunakan untuk membaca data dari posisi terakhir menuju posisi pertama. |
+| `riwayatTransaksi.get(i)` | Mengambil transaksi berdasarkan indeks yang sedang diproses. |
+| `System.out.println(...)` | Menampilkan setiap transaksi secara berurutan dari transaksi terbaru hingga transaksi terlama. |
 
-* `case 6:` memanggil `tampilkanLokasi();`
-  Menjalankan method untuk menampilkan denah seluruh lantai, rak, dan posisi dari Array 3D.
+Dengan cara ini, pengguna dapat melihat seluruh riwayat transaksi yang masih tersimpan di dalam Stack.
 
-#### E. Method `bacaAngka` (pembaca input angka yang aman)
+### H. Menu Antrean Mahasiswa (Queue)
 
-* `static int bacaAngka(String pesan) {`
-  Mendeklarasikan method yang menerima teks pesan (misalnya "Pilih menu (1-7): ") dan mengembalikan sebuah angka `int`.
+Menu antrean mahasiswa digunakan untuk menambahkan mahasiswa ke antrean, melihat urutan antrean, dan memproses mahasiswa berikutnya.
 
-* `while (true) {`
-  Perulangan tanpa henti yang baru berhenti ketika pengguna memasukkan angka yang benar (melalui `return`).
+Menu Queue menampilkan pilihan untuk menambahkan antrean mahasiswa, menampilkan antrean, memproses mahasiswa berikutnya, dan kembali ke menu utama.
 
-* `System.out.print(pesan);`
-  Menampilkan pertanyaan kepada pengguna.
+| Operasi | Penjelasan |
+|---------|------------|
+| `antreanMahasiswa.offer(nama)` | Menambahkan nama mahasiswa ke bagian belakang antrean. |
+| `antreanMahasiswa.poll()` | Mengambil sekaligus menghapus mahasiswa yang berada di bagian depan antrean. |
+| `antreanMahasiswa.isEmpty()` | Memeriksa apakah antrean kosong sebelum data ditampilkan atau diproses. |
 
-* `String input = scanner.nextLine().trim();`
-  Membaca satu baris ketikan pengguna sebagai teks, lalu `trim()` membuang spasi di awal dan akhir.
+Perulangan *for-each* digunakan untuk membaca dan menampilkan seluruh mahasiswa sesuai urutan antrean tanpa menghapus data.
 
-* `try { return Integer.parseInt(input); }`
-  Mencoba mengubah teks menjadi angka. Jika berhasil, angka langsung dikembalikan dan method selesai.
+### I. Fitur Menambahkan Mahasiswa ke Antrean
 
-* `catch (NumberFormatException e) { System.out.println("Input harus berupa angka!"); }`
-  Jika pengguna mengetik huruf atau simbol, perubahan ke angka gagal dan Java melemparkan `NumberFormatException`. Blok `catch` menangkapnya, menampilkan peringatan, dan perulangan `while` mengulang pertanyaan. Dengan cara ini program tidak akan berhenti mendadak.
+| Kode | Penjelasan |
+|------|------------|
+| `String nama = scanner.nextLine().trim();` | Membaca nama mahasiswa yang dimasukkan pengguna. |
+| `nama.isEmpty()` | Memeriksa apakah nama mahasiswa kosong. Jika kosong, data tidak dimasukkan ke antrean. |
+| `antreanMahasiswa.offer(nama);` | Menambahkan nama mahasiswa ke bagian belakang antrean. |
+| `System.out.println(...)` | Menampilkan pesan bahwa mahasiswa berhasil ditambahkan ke antrean. |
 
-#### F. Method `tambahBuku()` (menambah buku ke ArrayList dan Array 3D)
+Setiap mahasiswa akan ditempatkan di belakang mahasiswa yang sudah lebih dahulu mengantre.
 
-* `System.out.print("Judul buku: ");` dan `String judul = scanner.nextLine().trim();`
-  Meminta dan membaca judul buku dari pengguna.
+### J. Fitur Menampilkan Antrean Mahasiswa
 
-* `if (judul.isEmpty()) { ... return; }`
-  Percabangan untuk memeriksa apakah judul kosong. Jika kosong, program menampilkan pesan lalu `return` menghentikan method sehingga buku tidak ditambahkan.
+| Kode | Penjelasan |
+|------|------------|
+| `antreanMahasiswa.isEmpty()` | Memeriksa apakah terdapat mahasiswa dalam antrean. |
+| `for (String nama : antreanMahasiswa)` | Melakukan perulangan untuk membaca setiap nama mahasiswa dalam urutan antrean. |
+| `System.out.println(...)` | Menampilkan nama mahasiswa sesuai urutan kedatangan. |
 
-* `for (int i = 0; i < kategoriBuku.length; i++) { System.out.println((i + 1) + ". " + kategoriBuku[i]); }`
-  Perulangan untuk mencetak pilihan kategori dari array `kategoriBuku` milik Anggota 1, diberi nomor mulai dari 1.
+Fitur ini hanya menampilkan data dan tidak menghapus mahasiswa dari antrean.
 
-* `int k = bacaAngka("Nomor kategori: ");`
-  Membaca nomor kategori yang dipilih pengguna.
+### K. Fitur Memproses Mahasiswa Berikutnya
 
-* `if (k < 1 || k > kategoriBuku.length) { ... return; }`
-  Memastikan nomor kategori berada dalam rentang 1 sampai 4. Jika tidak, proses dibatalkan.
+| Kode | Penjelasan |
+|------|------------|
+| `antreanMahasiswa.isEmpty()` | Memeriksa apakah antrean memiliki mahasiswa yang dapat diproses. |
+| `antreanMahasiswa.poll()` | Mengambil dan menghapus mahasiswa yang berada di urutan paling depan. |
+| `System.out.println(...)` | Menampilkan nama mahasiswa yang sedang diproses. |
 
-* `int lantai = bacaAngka(...);`, `int rak = bacaAngka(...);`, dan `int posisi = bacaAngka(...);`
-  Membaca tiga angka lokasi penyimpanan dari pengguna. Batas yang ditampilkan pada pesan mengambil nilai dari konstanta, sehingga selalu sesuai ukuran rak.
+Fitur ini menerapkan prinsip FIFO karena mahasiswa yang pertama masuk ke antrean akan diproses terlebih dahulu.
 
-* `if (lantai < 1 || lantai > JUMLAH_LANTAI || rak < 1 || rak > JUMLAH_RAK || posisi < 1 || posisi > JUMLAH_POSISI) { ... return; }`
-  Percabangan dengan operator logika `||` (atau) untuk memeriksa apakah salah satu dari tiga angka lokasi berada di luar jangkauan. Jika ya, proses dibatalkan agar tidak terjadi error `ArrayIndexOutOfBoundsException`.
+---
 
-* `if (!lokasiBuku[lantai - 1][rak - 1][posisi - 1].equals("Kosong")) { ... return; }`
-  Memeriksa apakah slot yang dipilih sudah terisi. Pengurangan `- 1` diperlukan karena pengguna mengetik angka mulai dari 1, sedangkan indeks array dimulai dari 0. Tanda `!` membalik hasil `equals`, jadi blok ini berjalan bila slot **bukan** "Kosong", lalu menampilkan judul buku yang sudah menempati slot tersebut dan membatalkan proses.
+## 3. Skenario Pengujian dan Hasil
 
-* `daftarBuku.add(new Buku(judul, kategoriBuku[k - 1], lantai, rak, posisi));`
-  Membuat objek `Buku` baru dari data yang dimasukkan, lalu `add` menambahkannya ke bagian akhir ArrayList. Ukuran ArrayList otomatis bertambah satu.
+### A. Pengujian Stack
 
-* `lokasiBuku[lantai - 1][rak - 1][posisi - 1] = judul;`
-  Menaruh judul buku pada slot yang dipilih di Array 3D, sehingga slot tersebut tidak lagi "Kosong".
+| No. | Skenario Pengujian | Hasil yang Diharapkan |
+|:---:|--------------------|-----------------------|
+| 1 | Menambahkan transaksi Peminjaman buku Basis Data | Transaksi berhasil ditambahkan |
+| 2 | Menambahkan transaksi Pengembalian buku Matematika | Transaksi berhasil ditambahkan |
+| 3 | Melihat transaksi terakhir | Menampilkan Pengembalian buku Matematika |
+| 4 | Membatalkan transaksi terakhir | Transaksi Pengembalian buku Matematika dihapus dari riwayat |
+| 5 | Menampilkan seluruh riwayat | Menampilkan transaksi yang masih tersimpan dari terbaru ke terlama |
 
-* `System.out.println("Buku \"" + judul + "\" berhasil ditambahkan.");`
-  Menampilkan pesan bahwa penambahan berhasil.
+### B. Pengujian Queue
 
-#### G. Method `tampilkanDaftarBuku()` (menampilkan isi ArrayList)
+| No. | Skenario Pengujian | Hasil yang Diharapkan |
+|:---:|--------------------|-----------------------|
+| 1 | Menambahkan mahasiswa Andi | Andi berhasil masuk antrean |
+| 2 | Menambahkan mahasiswa Budi | Budi berhasil masuk setelah Andi |
+| 3 | Menampilkan antrean mahasiswa | Andi tampil sebelum Budi |
+| 4 | Memproses mahasiswa berikutnya | Andi diproses terlebih dahulu |
+| 5 | Menampilkan antrean kembali | Budi menjadi mahasiswa terdepan |
 
-* `if (daftarBuku.isEmpty()) { System.out.println("Belum ada buku."); return; }`
-  Memeriksa apakah ArrayList kosong. Jika kosong, program menampilkan pesan dan menghentikan method.
-
-* `System.out.println(String.format("%-4s%-30s%-20s%s", "No", "Judul", "Kategori", "Lokasi"));`
-  Mencetak judul kolom tabel. Format `%-4s` berarti teks rata kiri dengan lebar 4 karakter, sehingga kolom tampil sejajar dan rapi.
-
-* `for (int i = 0; i < daftarBuku.size(); i++) {`
-  Perulangan sebanyak jumlah buku. Method `size()` mengembalikan banyaknya elemen di ArrayList.
-
-* `Buku b = daftarBuku.get(i);`
-  Mengambil objek `Buku` pada urutan ke-`i` dari ArrayList dan menyimpannya sementara pada variabel `b`.
-
-* `System.out.println(String.format("%-4d%-30s%-20sLt.%d Rak %d Pos %d", (i + 1), b.getJudul(), b.getKategori(), b.getLantai(), b.getRak(), b.getPosisi()));`
-  Mencetak satu baris data buku: nomor urut, judul, kategori, dan lokasi. Data dibaca melalui getter dan `(i + 1)` dipakai agar nomor urut dimulai dari 1.
-
-* `System.out.println("Total buku: " + daftarBuku.size());`
-  Menampilkan jumlah seluruh buku yang tersimpan.
-
-#### H. Method `hapusBuku()` (menghapus dari ArrayList dan mengosongkan Array 3D)
-
-* `if (daftarBuku.isEmpty()) { ... return; }`
-  Jika belum ada buku, program menampilkan pesan dan tidak melanjutkan proses penghapusan.
-
-* `tampilkanDaftarBuku();`
-  Menampilkan daftar buku terlebih dahulu agar pengguna dapat melihat nomor buku yang akan dihapus.
-
-* `int nomor = bacaAngka("Nomor buku yang dihapus: ");`
-  Membaca nomor buku yang dipilih pengguna.
-
-* `if (nomor < 1 || nomor > daftarBuku.size()) { ... return; }`
-  Memastikan nomor berada di antara 1 dan jumlah buku yang ada. Jika tidak valid, proses dibatalkan.
-
-* `Buku dihapus = daftarBuku.remove(nomor - 1);`
-  Method `remove` menghapus buku pada indeks `nomor - 1` dari ArrayList dan mengembalikan objek yang dihapus, yang disimpan di variabel `dihapus`. Elemen setelahnya otomatis bergeser maju sehingga tidak ada celah kosong di daftar.
-
-* `lokasiBuku[dihapus.getLantai() - 1][dihapus.getRak() - 1][dihapus.getPosisi() - 1] = "Kosong";`
-  Memakai data lokasi dari buku yang baru dihapus untuk menemukan slotnya di Array 3D, lalu mengembalikan isinya menjadi "Kosong" agar slot dapat dipakai buku lain.
-
-* `System.out.println("Buku \"" + dihapus.getJudul() + "\" berhasil dihapus dan posisinya dikosongkan.");`
-  Menampilkan pesan bahwa penghapusan berhasil.
-
-#### I. Method `tampilkanLokasi()` (menampilkan denah Array 3D)
-
-* `for (int l = 0; l < JUMLAH_LANTAI; l++) {`
-  Perulangan terluar yang berjalan untuk setiap lantai.
-
-* `System.out.println("== Lantai " + (l + 1) + " ==");`
-  Mencetak judul lantai. Ditambah 1 agar tampil sebagai Lantai 1 dan Lantai 2, bukan 0 dan 1.
-
-* `for (int r = 0; r < JUMLAH_RAK; r++) {` dan `System.out.println("  Rak " + (r + 1) + ":");`
-  Perulangan tengah untuk setiap rak di lantai tersebut, beserta pencetakan nama rak.
-
-* `for (int p = 0; p < JUMLAH_POSISI; p++) {`
-  Perulangan terdalam untuk setiap posisi di dalam rak.
-
-* `System.out.println("    Posisi " + (p + 1) + ": " + lokasiBuku[l][r][p]);`
-  Mencetak nomor posisi beserta isi slot tersebut, yaitu judul buku atau "Kosong". Hasil akhirnya adalah denah bertingkat: lantai, rak, lalu posisi.
+Pengujian dilakukan dengan menjalankan program dan memilih menu Stack maupun Queue. Hasil aktual pengujian dapat didokumentasikan melalui tangkapan layar (*screenshot*) setelah setiap fitur dijalankan.
